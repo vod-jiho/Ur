@@ -1,0 +1,367 @@
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+local PlayerGui = LocalPlayer:WaitForChild("PlayerGui")
+
+-- Remove existing UI if present to prevent duplication
+if PlayerGui:FindFirstChild("BoboMosUI") then
+    PlayerGui.BoboMosUI:Destroy()
+end
+
+-- ScreenGui Setup
+local ScreenGui = Instance.new("ScreenGui")
+ScreenGui.Name = "BoboMosUI"
+ScreenGui.ResetOnSpawn = false
+ScreenGui.Parent = PlayerGui
+
+-- 1. Main Toggle Button (Opens/Closes UI)
+local ToggleBtn = Instance.new("TextButton")
+ToggleBtn.Name = "ToggleBtn"
+ToggleBtn.Size = UDim2.new(0, 110, 0, 36)
+ToggleBtn.Position = UDim2.new(0, 20, 0, 20)
+ToggleBtn.BackgroundColor3 = Color3.fromRGB(20, 20, 25)
+ToggleBtn.BorderSizePixel = 0
+ToggleBtn.Text = "Toggle UI"
+ToggleBtn.TextColor3 = Color3.fromRGB(0, 255, 170)
+ToggleBtn.Font = Enum.Font.GothamBold
+ToggleBtn.TextSize = 14
+ToggleBtn.Parent = ScreenGui
+
+local ToggleCorner = Instance.new("UICorner")
+ToggleCorner.CornerRadius = UDim.new(0, 6)
+ToggleCorner.Parent = ToggleBtn
+
+local ToggleStroke = Instance.new("UIStroke")
+ToggleStroke.Color = Color3.fromRGB(0, 255, 170)
+ToggleStroke.Thickness = 1.5
+ToggleStroke.Parent = ToggleBtn
+
+-- 2. Main Frame (Dark Neon Theme)
+local MainFrame = Instance.new("Frame")
+MainFrame.Name = "MainFrame"
+MainFrame.Size = UDim2.new(0, 320, 0, 470)
+MainFrame.Position = UDim2.new(0.5, -160, 0.5, -235)
+MainFrame.BackgroundColor3 = Color3.fromRGB(18, 18, 22)
+MainFrame.BorderSizePixel = 0
+MainFrame.Visible = false
+MainFrame.Active = true
+MainFrame.Draggable = true
+MainFrame.Parent = ScreenGui
+
+local MainCorner = Instance.new("UICorner")
+MainCorner.CornerRadius = UDim.new(0, 8)
+MainCorner.Parent = MainFrame
+
+local MainStroke = Instance.new("UIStroke")
+MainStroke.Color = Color3.fromRGB(50, 50, 60)
+MainStroke.Thickness = 1.5
+MainStroke.Parent = MainFrame
+
+-- Top Title Bar
+local TitleLabel = Instance.new("TextLabel")
+TitleLabel.Size = UDim2.new(1, 0, 0, 40)
+TitleLabel.BackgroundColor3 = Color3.fromRGB(25, 25, 32)
+TitleLabel.BorderSizePixel = 0
+TitleLabel.Text = "  BOBO MOS CONTROL"
+TitleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+TitleLabel.Font = Enum.Font.GothamBold
+TitleLabel.TextSize = 14
+TitleLabel.TextXAlignment = Enum.TextXAlignment.Left
+TitleLabel.Parent = MainFrame
+
+local TitleCorner = Instance.new("UICorner")
+TitleCorner.CornerRadius = UDim.new(0, 8)
+TitleCorner.Parent = TitleLabel
+
+-- 3. Bobo Mos Button (First-person lock + Player list display)
+local BoboMosBtn = Instance.new("TextButton")
+BoboMosBtn.Size = UDim2.new(1, -24, 0, 34)
+BoboMosBtn.Position = UDim2.new(0, 12, 0, 48)
+BoboMosBtn.BackgroundColor3 = Color3.fromRGB(32, 32, 40)
+BoboMosBtn.Text = "bobo mos (First Person & List)"
+BoboMosBtn.TextColor3 = Color3.fromRGB(0, 255, 170)
+BoboMosBtn.Font = Enum.Font.GothamSemibold
+BoboMosBtn.TextSize = 13
+BoboMosBtn.Parent = MainFrame
+
+local BoboCorner = Instance.new("UICorner")
+BoboCorner.CornerRadius = UDim.new(0, 6)
+BoboCorner.Parent = BoboMosBtn
+
+-- 4. Player List Scrolling Frame
+local PlayerListFrame = Instance.new("ScrollingFrame")
+PlayerListFrame.Size = UDim2.new(1, -24, 0, 100)
+PlayerListFrame.Position = UDim2.new(0, 12, 0, 88)
+PlayerListFrame.BackgroundColor3 = Color3.fromRGB(14, 14, 18)
+PlayerListFrame.BorderSizePixel = 0
+PlayerListFrame.ScrollBarThickness = 4
+PlayerListFrame.Visible = false
+PlayerListFrame.Parent = MainFrame
+
+local ListCorner = Instance.new("UICorner")
+ListCorner.CornerRadius = UDim.new(0, 6)
+ListCorner.Parent = PlayerListFrame
+
+local UIListLayout = Instance.new("UIListLayout")
+UIListLayout.Padding = UDim.new(0, 4)
+UIListLayout.Parent = PlayerListFrame
+
+-- 5. TP Button (Teleport to selected user)
+local TpBtn = Instance.new("TextButton")
+TpBtn.Size = UDim2.new(1, -24, 0, 34)
+TpBtn.Position = UDim2.new(0, 12, 0, 194)
+TpBtn.BackgroundColor3 = Color3.fromRGB(32, 32, 40)
+TpBtn.Text = "TP (No User Selected)"
+TpBtn.TextColor3 = Color3.fromRGB(200, 200, 200)
+TpBtn.Font = Enum.Font.GothamSemibold
+TpBtn.TextSize = 13
+TpBtn.Parent = MainFrame
+
+local TpCorner = Instance.new("UICorner")
+TpCorner.CornerRadius = UDim.new(0, 6)
+TpCorner.Parent = TpBtn
+
+-- 6. Freeze Button (Toggle character anchorage)
+local FreezeBtn = Instance.new("TextButton")
+FreezeBtn.Size = UDim2.new(0.48, -14, 0, 34)
+FreezeBtn.Position = UDim2.new(0, 12, 0, 234)
+FreezeBtn.BackgroundColor3 = Color3.fromRGB(32, 32, 40)
+FreezeBtn.Text = "Freeze: OFF"
+FreezeBtn.TextColor3 = Color3.fromRGB(100, 200, 255)
+FreezeBtn.Font = Enum.Font.GothamSemibold
+FreezeBtn.TextSize = 13
+FreezeBtn.Parent = MainFrame
+
+local FreezeCorner = Instance.new("UICorner")
+FreezeCorner.CornerRadius = UDim.new(0, 6)
+FreezeCorner.Parent = FreezeBtn
+
+-- 7. Other Ban Button (Kick self)
+local OtherBanBtn = Instance.new("TextButton")
+OtherBanBtn.Size = UDim2.new(0.48, -14, 0, 34)
+OtherBanBtn.Position = UDim2.new(0.52, 2, 0, 234)
+OtherBanBtn.BackgroundColor3 = Color3.fromRGB(180, 40, 50)
+OtherBanBtn.Text = "Other Ban"
+OtherBanBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+OtherBanBtn.Font = Enum.Font.GothamBold
+OtherBanBtn.TextSize = 13
+OtherBanBtn.Parent = MainFrame
+
+local BanCorner = Instance.new("UICorner")
+BanCorner.CornerRadius = UDim.new(0, 6)
+BanCorner.Parent = OtherBanBtn
+
+-- 8. Vold TP Button (Teleports to random players every 0.2s)
+local VoldTpBtn = Instance.new("TextButton")
+VoldTpBtn.Size = UDim2.new(1, -24, 0, 34)
+VoldTpBtn.Position = UDim2.new(0, 12, 0, 274)
+VoldTpBtn.BackgroundColor3 = Color3.fromRGB(32, 32, 40)
+VoldTpBtn.Text = "vold tp: OFF"
+VoldTpBtn.TextColor3 = Color3.fromRGB(200, 100, 255)
+VoldTpBtn.Font = Enum.Font.GothamSemibold
+VoldTpBtn.TextSize = 13
+VoldTpBtn.Parent = MainFrame
+
+local VoldCorner = Instance.new("UICorner")
+VoldCorner.CornerRadius = UDim.new(0, 6)
+VoldCorner.Parent = VoldTpBtn
+
+-- 9. Lag Mode Button (Simulates laggy/stuttering movement)
+local LagModeBtn = Instance.new("TextButton")
+LagModeBtn.Size = UDim2.new(1, -24, 0, 34)
+LagModeBtn.Position = UDim2.new(0, 12, 0, 314)
+LagModeBtn.BackgroundColor3 = Color3.fromRGB(32, 32, 40)
+LagModeBtn.Text = "Lag Mode: OFF"
+LagModeBtn.TextColor3 = Color3.fromRGB(255, 140, 0)
+LagModeBtn.Font = Enum.Font.GothamSemibold
+LagModeBtn.TextSize = 13
+LagModeBtn.Parent = MainFrame
+
+local LagCorner = Instance.new("UICorner")
+LagCorner.CornerRadius = UDim.new(0, 6)
+LagCorner.Parent = LagModeBtn
+
+-- 10. Bottom Status Label
+local StatusLabel = Instance.new("TextLabel")
+StatusLabel.Size = UDim2.new(1, -24, 0, 26)
+StatusLabel.Position = UDim2.new(0, 12, 1, -34)
+StatusLabel.BackgroundColor3 = Color3.fromRGB(12, 12, 15)
+StatusLabel.BorderSizePixel = 0
+StatusLabel.Text = "hacker mod v1.39.5 Checking Roblox CPU..."
+StatusLabel.TextColor3 = Color3.fromRGB(0, 255, 170)
+StatusLabel.Font = Enum.Font.Code
+StatusLabel.TextSize = 11
+StatusLabel.Parent = MainFrame
+
+local StatusCorner = Instance.new("UICorner")
+StatusCorner.CornerRadius = UDim.new(0, 4)
+StatusCorner.Parent = StatusLabel
+
+
+--- [ Logic Implementation ] ---
+
+local selectedPlayer = nil
+local isFrozen = false
+local isVoldTpActive = false
+local isLagModeActive = false
+
+-- Toggle UI Visibility
+ToggleBtn.MouseButton1Click:Connect(function()
+    MainFrame.Visible = not MainFrame.Visible
+    ToggleBtn.Text = MainFrame.Visible and "Close UI" or "Toggle UI"
+end)
+
+-- Refresh Player List
+local function refreshPlayerList()
+    for _, child in ipairs(PlayerListFrame:GetChildren()) do
+        if child:IsA("TextButton") then
+            child:Destroy()
+        end
+    end
+
+    for _, player in ipairs(Players:GetPlayers()) do
+        if player ~= LocalPlayer then
+            local pBtn = Instance.new("TextButton")
+            pBtn.Size = UDim2.new(1, -8, 0, 26)
+            pBtn.BackgroundColor3 = Color3.fromRGB(28, 28, 35)
+            pBtn.Text = "  " .. player.DisplayName .. " (@" .. player.Name .. ")"
+            pBtn.TextColor3 = Color3.fromRGB(230, 230, 230)
+            pBtn.Font = Enum.Font.Gotham
+            pBtn.TextSize = 12
+            pBtn.TextXAlignment = Enum.TextXAlignment.Left
+            pBtn.Parent = PlayerListFrame
+
+            local pCorner = Instance.new("UICorner")
+            pCorner.CornerRadius = UDim.new(0, 4)
+            pCorner.Parent = pBtn
+
+            pBtn.MouseButton1Click:Connect(function()
+                selectedPlayer = player
+                TpBtn.Text = "TP -> " .. player.DisplayName
+                TpBtn.TextColor3 = Color3.fromRGB(0, 255, 170)
+                
+                for _, btn in ipairs(PlayerListFrame:GetChildren()) do
+                    if btn:IsA("TextButton") then
+                        btn.BackgroundColor3 = Color3.fromRGB(28, 28, 35)
+                    end
+                end
+                pBtn.BackgroundColor3 = Color3.fromRGB(45, 75, 65)
+            end)
+        end
+    end
+    PlayerListFrame.CanvasSize = UDim2.new(0, 0, 0, UIListLayout.AbsoluteContentSize.Y)
+end
+
+-- 1) Bobo Mos Click
+BoboMosBtn.MouseButton1Click:Connect(function()
+    LocalPlayer.CameraMode = Enum.CameraMode.LockFirstPerson
+    PlayerListFrame.Visible = true
+    refreshPlayerList()
+end)
+
+-- 2) TP Click
+TpBtn.MouseButton1Click:Connect(function()
+    if selectedPlayer and selectedPlayer.Character and selectedPlayer.Character:FindFirstChild("HumanoidRootPart") then
+        local myChar = LocalPlayer.Character
+        if myChar and myChar:FindFirstChild("HumanoidRootPart") then
+            myChar.HumanoidRootPart.CFrame = selectedPlayer.Character.HumanoidRootPart.CFrame * CFrame.new(0, 0, 3)
+        end
+    else
+        TpBtn.Text = "TP (Target Character Not Found)"
+    end
+end)
+
+-- 3) Freeze Click
+FreezeBtn.MouseButton1Click:Connect(function()
+    isFrozen = not isFrozen
+    local myChar = LocalPlayer.Character
+    if myChar and myChar:FindFirstChild("HumanoidRootPart") then
+        myChar.HumanoidRootPart.Anchored = isFrozen
+    end
+    
+    if isFrozen then
+        FreezeBtn.Text = "Freeze: ON"
+        FreezeBtn.BackgroundColor3 = Color3.fromRGB(0, 120, 200)
+        FreezeBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+    else
+        FreezeBtn.Text = "Freeze: OFF"
+        FreezeBtn.BackgroundColor3 = Color3.fromRGB(32, 32, 40)
+        FreezeBtn.TextColor3 = Color3.fromRGB(100, 200, 255)
+    end
+end)
+
+-- 4) Other Ban Click
+OtherBanBtn.MouseButton1Click:Connect(function()
+    LocalPlayer:Kick("Other Ban executed - Connection terminated.")
+end)
+
+-- 5) Vold TP Click (Random teleport loop every 0.2s)
+VoldTpBtn.MouseButton1Click:Connect(function()
+    isVoldTpActive = not isVoldTpActive
+    if isVoldTpActive then
+        VoldTpBtn.Text = "vold tp: ON"
+        VoldTpBtn.BackgroundColor3 = Color3.fromRGB(100, 40, 150)
+        task.spawn(function()
+            while isVoldTpActive do
+                task.wait(0.2)
+                if not isVoldTpActive then break end
+                local allPlayers = Players:GetPlayers()
+                local others = {}
+                for _, p in ipairs(allPlayers) do
+                    if p ~= LocalPlayer then
+                        table.insert(others, p)
+                    end
+                end
+                if #others > 0 then
+                    local randomTarget = others[math.random(1, #others)]
+                    if randomTarget.Character and randomTarget.Character:FindFirstChild("HumanoidRootPart") then
+                        local myChar = LocalPlayer.Character
+                        if myChar and myChar:FindFirstChild("HumanoidRootPart") then
+                            myChar.HumanoidRootPart.CFrame = randomTarget.Character.HumanoidRootPart.CFrame * CFrame.new(math.random(-2, 2), 0, math.random(-2, 2))
+                        end
+                    end
+                end
+            end
+        end)
+    else
+        VoldTpBtn.Text = "vold tp: OFF"
+        VoldTpBtn.BackgroundColor3 = Color3.fromRGB(32, 32, 40)
+    end
+end)
+
+-- 6) Lag Mode Click (Simulates lagging/stuttering movement)
+LagModeBtn.MouseButton1Click:Connect(function()
+    isLagModeActive = not isLagModeActive
+    if isLagModeActive then
+        LagModeBtn.Text = "Lag Mode: ON"
+        LagModeBtn.BackgroundColor3 = Color3.fromRGB(180, 80, 0)
+        task.spawn(function()
+            while isLagModeActive do
+                task.wait(0.18)
+                if not isLagModeActive then break end
+                local myChar = LocalPlayer.Character
+                if myChar and myChar:FindFirstChild("HumanoidRootPart") then
+                    local hrp = myChar.HumanoidRootPart
+                    local offset = Vector3.new(math.random(-4, 4), 0, math.random(-4, 4))
+                    hrp.CFrame = hrp.CFrame + offset
+                    task.wait(0.1)
+                    if not isLagModeActive then break end
+                    hrp.CFrame = hrp.CFrame - offset
+                end
+            end
+        end)
+    else
+        LagModeBtn.Text = "Lag Mode: OFF"
+        LagModeBtn.BackgroundColor3 = Color3.fromRGB(32, 32, 40)
+    end
+end)
+
+-- Player Events
+Players.PlayerAdded:Connect(refreshPlayerList)
+Players.PlayerRemoving:Connect(function(player)
+    if selectedPlayer == player then
+        selectedPlayer = nil
+        TpBtn.Text = "TP (No User Selected)"
+        TpBtn.TextColor3 = Color3.fromRGB(200, 200, 200)
+    end
+    refreshPlayerList()
+end)
